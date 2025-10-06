@@ -5,23 +5,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
-import Enquiry from "@/models/Enquiry"
 import { formatDistanceToNow } from "date-fns"
-import { connectToDB } from "@/lib/db"
 
-async function getRecentEnquiries() {
-  await connectToDB()
-  const enquiries = await Enquiry.find().sort({ createdAt: -1 }).limit(5).lean()
-  return enquiries.map((e: any) => ({
-    ...e,
-    _id: e._id.toString(),
-    createdAt: e.createdAt.toISOString(),
-  }))
-}
-
-export async function RecentEnquiries() {
-  const enquiries = await getRecentEnquiries()
-
+export function RecentEnquiries({ enquiries }: { enquiries: any }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">

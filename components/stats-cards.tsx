@@ -1,55 +1,31 @@
-export const dynamic = "force-dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, Layers, Users } from "lucide-react"
-import { connectToDB } from "@/lib/db"
-import Enquiry from "@/models/Enquiry"
-import Section from "@/models/Section"
-import AdminUser from "@/models/AdminUser"
 
-async function getStats() {
-  await connectToDB()
-
-  const [totalEnquiries, newEnquiries, totalSections, totalUsers] = await Promise.all([
-    Enquiry.countDocuments(),
-    Enquiry.countDocuments({ status: "new" }),
-    Section.countDocuments({ isActive: true }),
-    AdminUser.countDocuments(),
-  ]);
-
-  return {
-    totalEnquiries,
-    newEnquiries,
-    totalSections,
-    totalUsers,
-  }
-}
-
-export async function StatsCards() {
-  const stats = await getStats()
+export function StatsCards({ stats }: { stats: any }) {
 
   const cards = [
     {
       title: "Total Enquiries",
-      value: stats.totalEnquiries,
-      description: `${stats.newEnquiries} new enquiries`,
+      value: stats.totalEnquiries || 0,
+      description: `New enquiries`,
       icon: Mail,
       trend: "+12% from last month",
     },
     {
       title: "Active Sections",
-      value: stats.totalSections,
+      value: stats.totalSections || 0,
       description: "Content sections live",
       icon: Layers,
       trend: "All systems operational",
     },
     {
       title: "Admin Users",
-      value: stats.totalUsers,
+      value: stats.totalUsers || 0,
       description: "Active administrators",
       icon: Users,
       trend: "Secure access",
     },
-  ]
+  ];
 
   return (
     <div className="flex gap-6">
