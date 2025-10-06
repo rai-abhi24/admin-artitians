@@ -1,5 +1,6 @@
+export const dynamic = "force-dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, Layers, Users, TrendingUp } from "lucide-react"
+import { Mail, Layers, Users } from "lucide-react"
 import { connectToDB } from "@/lib/db"
 import Enquiry from "@/models/Enquiry"
 import Section from "@/models/Section"
