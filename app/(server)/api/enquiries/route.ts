@@ -148,3 +148,32 @@ export async function GET(req: NextRequest) {
         );
     }
 }
+
+export async function DELETE(req: NextRequest) {
+    try {
+        await connectToDB();
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get('id');
+        if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });
+
+        const enquiry = await Enquiry.findOneAndDelete({ _id: id });
+        if (!enquiry) return NextResponse.json({ error: 'Enquiry not found' }, { status: 404 });
+
+        return NextResponse.json(
+            {
+                success: true,
+                message: 'Enquiry deleted successfully'
+            },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error('Error deleting enquiry:', error);
+        return NextResponse.json(
+            {
+                success: false,
+                message: 'Internal server error'
+            },
+            { status: 500 }
+        );
+    }
+}

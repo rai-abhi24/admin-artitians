@@ -130,7 +130,7 @@ export function PartnersTable({ onEdit }: PartnersTableProps) {
             setDeleteItem(null)
           }}
           title="Delete Partner"
-          description={`Are you sure you want to delete "${deleteItem.title}"? This action cannot be undone.`}
+          description={<>Are you sure you want to delete <strong>{deleteItem.title}</strong>? This action cannot be undone.</>}
         />
       )}
     </>
