@@ -6,7 +6,7 @@ export async function GET() {
     try {
         await connectToDB();
 
-        let section = await Section.findOne({ type: "module" });
+        const section = await Section.findOne({ type: "module" });
 
         return NextResponse.json({ success: true, modules: section.modules || [] });
     } catch (error: any) {
