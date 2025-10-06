@@ -30,8 +30,6 @@ export async function POST(req: NextRequest) {
         }
 
         const user = await AdminUser.findOne({ email }).lean<{ _id: string; email: string }>();
-        // Always respond success to avoid user enumeration
-        console.log("user", user);
 
         if (!user) {
             return NextResponse.json({ success: false, message: "We couldn’t find an account with this email." }, { status: 404 });
@@ -42,7 +40,6 @@ export async function POST(req: NextRequest) {
         const now = Date.now();
         const expiresAt = new Date(now + FIVE_MINUTES_MS);
 
-        // Invalidate any previous unused tokens for this user
         await PasswordResetToken.updateMany({ userId: user._id, status: "unused" }, { $set: { status: "used" } });
 
         await PasswordResetToken.create({
@@ -57,7 +54,7 @@ export async function POST(req: NextRequest) {
 
         const ts = Date.now();
         const baseUrl = process.env.APP_BASE_URL || `${req.nextUrl.origin}`;
-        const url = new URL("/reset-password", baseUrl);
+        const url = new URL("/admin/reset-password", baseUrl);
         url.searchParams.set("email", user.email);
         url.searchParams.set("token", rawToken);
         url.searchParams.set("ts", String(ts));
