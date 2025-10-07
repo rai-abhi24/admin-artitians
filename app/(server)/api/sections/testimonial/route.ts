@@ -1,14 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDB } from "@/lib/db";
 import Section from "@/models/Section";
+import memoryCache, { CacheKeys } from "@/lib/cache";
 
 export async function GET() {
     try {
+        const cacheKey = CacheKeys.SECTION("testimonial");
+
+        const cachedSection = memoryCache.get(cacheKey);
+        if (cachedSection) {
+            console.log('✅ Cache HIT - Section');
+            return NextResponse.json(
+                {
+                    success: true,
+                    section: cachedSection,
+                    source: 'cache'
+                },
+                { status: 200 }
+            );
+        }
+
+        console.log('❌ Cache MISS - Section - Fetching from DB');
+
         await connectToDB();
 
         let section = await Section.findOne({ type: "testimonial" });
         if (!section) {
             section = await Section.create({ type: "testimonial", testimonials: [] });
+        }
+
+        if (section) {
+            memoryCache.set(cacheKey, section, -1);
         }
 
         return NextResponse.json({ success: true, testimonials: section.testimonials || [] });
@@ -45,6 +67,10 @@ export async function POST(req: NextRequest) {
         section.testimonials.push(newTestimonial);
         await section.save();
 
+        const cacheKey = CacheKeys.SECTION("testimonial");
+        memoryCache.delete(cacheKey);
+        console.log('🗑️  Cache invalidated - Testimonials Section');
+
         return NextResponse.json({ success: true, testimonials: section.testimonials });
     } catch (error: any) {
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -70,6 +96,10 @@ export async function PUT(req: NextRequest) {
 
         await section.save();
 
+        const cacheKey = CacheKeys.SECTION("testimonial");
+        memoryCache.delete(cacheKey);
+        console.log('🗑️  Cache invalidated - Testimonials Section');
+
         return NextResponse.json({ success: true, testimonials: section.testimonials });
     } catch (error: any) {
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -87,6 +117,10 @@ export async function DELETE(req: NextRequest) {
 
         section.testimonials = section.testimonials.filter((t: any) => t._id.toString() !== id);
         await section.save();
+
+        const cacheKey = CacheKeys.SECTION("testimonial");
+        memoryCache.delete(cacheKey);
+        console.log('🗑️  Cache invalidated - Testimonials Section');
 
         return NextResponse.json({ success: true, testimonials: section.testimonials });
     } catch (error: any) {

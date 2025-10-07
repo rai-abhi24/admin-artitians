@@ -29,7 +29,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         refresh();
-         
+
     }, []);
 
     const value = useMemo<UserContextType>(() => ({ user, loading, refresh }), [user, loading]);

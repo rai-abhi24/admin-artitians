@@ -57,8 +57,6 @@ export default function EnquiryList() {
     }, [searchTerm]);
 
     const handleDeleteEnquiry = async (enquiryId: string) => {
-        if (!confirm('Are you sure you want to delete this enquiry?')) return;
-
         try {
             const response = await deleteEnquiry(enquiryId);
 

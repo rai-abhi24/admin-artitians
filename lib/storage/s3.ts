@@ -17,3 +17,7 @@ export const s3Client = new S3Client({
 export function buildObjectKey(parts: Array<string | undefined | null>) {
   return parts.filter(Boolean).join("/");
 }
+
+export function buildObjectUrl(key: string) {
+  return `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
+}

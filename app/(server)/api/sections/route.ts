@@ -1,15 +1,32 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/db";
 import Section from "@/models/Section";
+import memoryCache, { CacheKeys } from "@/lib/cache";
 
 export async function GET(req: Request) {
-    await connectToDB();
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
 
     if (!type) return NextResponse.json({ error: "type is required" }, { status: 400 });
 
-    // Ensure single doc per type (auto-create empty shell for partner/hero if needed)
+    const cacheKey = CacheKeys.SECTION(type);
+
+    const cachedSection = memoryCache.get(cacheKey);
+    if (cachedSection) {
+        console.log('✅ Cache HIT - Section');
+        return NextResponse.json(
+            {
+                success: true,
+                section: cachedSection,
+                source: 'cache'
+            },
+            { status: 200 }
+        );
+    }
+
+    console.log('❌ Cache MISS - Section - Fetching from DB');
+
+    await connectToDB();
     let section = await Section.findOne({ type });
     if (!section) {
         section = await Section.create(
@@ -18,7 +35,16 @@ export async function GET(req: Request) {
                 : { type, highlightedText: "", normalText: "", subtitle: "", backgroundImage: "", content: { galleryImages: [] } }
         );
     }
-    return NextResponse.json({ section });
+
+    if (section) {
+        memoryCache.set(cacheKey, section, -1);
+    }
+
+    return NextResponse.json({
+        success: true,
+        section: section,
+        source: 'db'
+    });
 }
 
 // HERO create
@@ -42,7 +68,15 @@ export async function POST(req: Request) {
         },
         { new: true, upsert: true }
     );
-    return NextResponse.json({ section }, { status: 201 });
+
+    if (section) {
+        memoryCache.set(CacheKeys.SECTION("hero"), section, -1);
+    }
+
+    return NextResponse.json({
+        success: true,
+        section: section,
+    });
 }
 
 // HERO update
@@ -66,5 +100,13 @@ export async function PUT(req: Request) {
         },
         { new: true, upsert: true }
     );
-    return NextResponse.json({ section: updated });
+
+    if (updated) {
+        memoryCache.set(CacheKeys.SECTION("hero"), updated, -1);
+    }
+
+    return NextResponse.json({
+        success: true,
+        section: updated,
+    });
 }

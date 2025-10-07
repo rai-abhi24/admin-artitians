@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/db";
 import Section from "@/models/Section";
+import memoryCache, { CacheKeys } from "@/lib/cache";
 
 async function ensurePartnerSection() {
     await connectToDB();
@@ -24,6 +25,11 @@ export async function POST(req: Request) {
     } as any);
 
     await section.save();
+
+    const cacheKey = CacheKeys.SECTION("partner");
+    memoryCache.delete(cacheKey);
+    console.log('🗑️  Cache invalidated - Partner Section');
+
     return NextResponse.json({ section }, { status: 201 });
 }
 
@@ -44,6 +50,11 @@ export async function PUT(req: Request) {
     if (typeof body.order === "number") item.order = body.order;
 
     await section.save();
+
+    const cacheKey = CacheKeys.SECTION("partner");
+    memoryCache.delete(cacheKey);
+    console.log('🗑️  Cache invalidated - Partner Section');
+
     return NextResponse.json({ section });
 }
 
@@ -55,5 +66,10 @@ export async function DELETE(req: Request) {
     const section = await ensurePartnerSection();
     section.partners = (section.partners || []).filter((p: any) => String(p._id) !== id);
     await section.save();
+
+    const cacheKey = CacheKeys.SECTION("partner");
+    memoryCache.delete(cacheKey);
+    console.log('🗑️  Cache invalidated - Partner Section');
+
     return NextResponse.json({ section });
 }

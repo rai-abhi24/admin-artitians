@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Eye, File as FileIcon, X } from "lucide-react";
-import { presignUpload } from "@/lib/services/merchant";
+import { presignUpload } from "@/lib/services/user";
 
 export type UploadFileProps = {
     files: string[]; // ✅ now an array
@@ -35,7 +35,6 @@ export function UploadFile({
         const presign = await presignUpload({
             fileName: blob.name,
             fileType: blob.type,
-            prefix: "merchants",
         });
 
         const { uploadUrl, url } = presign as any;
