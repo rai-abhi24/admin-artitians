@@ -13,17 +13,20 @@ import {
   Settings,
   LogOut,
   Menu,
+  UserCheck,
+  Package2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 const navigation = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Enquiries", href: "/admin/enquiries", icon: Mail },
   { name: "Hero Section", href: "/admin/hero", icon: ImageIcon },
-  { name: "Videos", href: "/admin/videos", icon: Video },
-  { name: "Partners", href: "/admin/partners", icon: Users },
-  { name: "Before-After", href: "/admin/before-after", icon: ImageIcon },
+  { name: "Testimonials", href: "/admin/testimonials", icon: Video },
+  { name: "Partners", href: "/admin/partners", icon: UserCheck },
+  { name: "Modules", href: "/admin/modules", icon: Package2 },
+  { name: "Admin Users", href: "/admin/users", icon: Users },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ]
 
